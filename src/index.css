@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Variables modo oscuro (default) ─────────────────── */
+:root {
+  --bg:      #0B1A12;
+  --surface: #111C15;
+  --border:  #1E3020;
+  --text:    #E8E6DF;
+  --text-2:  #8A9E8A;
+  --nav-bg:  #060E09;
+  --nav-text: #8A9E8A;
+  --nav-active: #14532D;
+}
+
+/* ── Variables modo claro ─────────────────────────────── */
+.light {
+  --bg:      #F7F6F2;
+  --surface: #FFFFFF;
+  --border:  #E8E6DF;
+  --text:    #1A1D1A;
+  --text-2:  #6B6B6A;
+  --nav-bg:  #0B2818;
+  --nav-text: #C8D9C4;
+  --nav-active: #14532D;
+}
+
+/* ── Base ─────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html { font-size: 14px; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+}
+
+/* ── Scrollbar fina ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ── Focus visible ────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #14532D;
+  outline-offset: 2px;
+}
+
+/* ── Mono para datos duros ────────────────────────────── */
+.data-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* ── Animación fade-in ────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 150ms ease forwards; }
+
+/* ── Command palette (cmdk) ───────────────────────────── */
+[cmdk-group-heading] {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2);
+  padding: 8px 12px 4px;
+  font-weight: 600;
+}
+
+/* ── Skeleton ─────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--surface) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 2px;
+}
