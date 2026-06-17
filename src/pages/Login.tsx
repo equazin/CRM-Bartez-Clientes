@@ -36,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="min-h-screen w-full flex items-center justify-center px-4" style={{ backgroundColor: 'var(--bg)' }}>
       <div className="w-full max-w-sm">
         {/* Logotipo */}
         <div className="mb-8">

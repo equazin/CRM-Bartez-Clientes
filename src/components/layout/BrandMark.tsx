@@ -13,7 +13,7 @@ const sizeClass = {
 export default function BrandMark({ size = 'md', className }: BrandMarkProps) {
   return (
     <img
-      src="/isologo.png"
+      src={`${import.meta.env.BASE_URL}isologo.png`}
       alt="Bartez"
       className={cn(sizeClass[size], 'flex-shrink-0 object-contain', className)}
       draggable={false}
