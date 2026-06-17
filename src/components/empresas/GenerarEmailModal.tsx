@@ -63,7 +63,7 @@ function ultimaInteraccion(interacciones: Interaccion[]): string | null {
   if (last.asunto) return last.asunto
   if (last.tipo === 'Llamada') return 'nuestra llamada'
   if (last.tipo === 'Reunión') return 'nuestra reunión'
-  if (last.tipo === 'Email') return 'nuestro intercambio de correos'
+  if (last.tipo === 'Email enviado' || last.tipo === 'Email recibido') return 'nuestro intercambio de correos'
   if (last.tipo === 'WhatsApp') return 'nuestra conversación por WhatsApp'
   return 'nuestro último contacto'
 }
