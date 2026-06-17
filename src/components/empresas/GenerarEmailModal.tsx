@@ -86,7 +86,7 @@ function generarEmail(
       const asunto = `Equipamiento IT para ${nombre} – Bartez Tecnología`
       const cuerpo = `${s},
 
-Mi nombre es [Tu nombre] y me comunico desde Bartez Tecnología, distribuidora mayorista de equipamiento informático con base en Rosario.
+Mi nombre es Nicolás Benítez y me comunico desde Bartez Tecnología, distribuidora mayorista de equipamiento informático con base en Rosario.
 
 Llegamos a ustedes porque trabajamos con varias empresas de ${sector} ${ubic} y vemos una oportunidad real de acompañarlos con soluciones de infraestructura IT: servidores, storage, networking, endpoints y más — con stock disponible y tiempos de entrega competitivos.
 
