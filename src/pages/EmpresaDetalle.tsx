@@ -14,7 +14,7 @@ import {
 import {
   ArrowLeft, Plus, Phone, Mail, Globe, MapPin, Building2,
   Check, ExternalLink, FileText, Pencil, Trash2, History, CalendarPlus,
-  Activity, Clock, BriefcaseBusiness,
+  Activity, Clock, BriefcaseBusiness, MailPlus,
 } from 'lucide-react'
 import RegistrarInteraccionDrawer from '@/components/interacciones/RegistrarInteraccionDrawer'
 import NuevoContactoForm from '@/components/contactos/NuevoContactoForm'
@@ -23,6 +23,7 @@ import SecuenciaSeguimientoDrawer from '@/components/empresas/SecuenciaSeguimien
 import NuevaOportunidadDrawer from '@/components/oportunidades/NuevaOportunidadDrawer'
 import ActualizarOportunidadDrawer from '@/components/oportunidades/ActualizarOportunidadDrawer'
 import MotivoPerdidaModal from '@/components/empresas/MotivoPerdidaModal'
+import GenerarEmailModal from '@/components/empresas/GenerarEmailModal'
 import { useToast } from '@/contexts/ToastContext'
 
 const DOCS_LABELS: Record<keyof DocsAlta, string> = {
@@ -103,6 +104,7 @@ export default function EmpresaDetalle() {
   const [editarOportunidad, setEditarOportunidad] = useState<Oportunidad | null>(null)
   const [confirmarEliminar, setConfirmarEliminar] = useState(false)
   const [motivoPerdidaOpen, setMotivoPerdidaOpen] = useState(false)
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [contactoFormOpen, setContactoFormOpen] = useState(false)
   const [notasEditando, setNotasEditando]     = useState(false)
   const [notasTemp, setNotasTemp]             = useState('')
@@ -415,6 +417,15 @@ export default function EmpresaDetalle() {
           {/* Controles: editar + eliminar + etapa */}
           <div className="flex-shrink-0 flex flex-col items-end gap-2">
             <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setEmailModalOpen(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border rounded-sm hover:border-green-deep hover:text-green-deep transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-2)' }}
+                title="Generar email personalizado"
+              >
+                <MailPlus size={12} />
+                Email
+              </button>
               <button
                 onClick={() => setSecuenciaOpen(true)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border rounded-sm hover:border-green-deep hover:text-green-deep transition-colors"
@@ -1045,6 +1056,14 @@ export default function EmpresaDetalle() {
         oportunidad={editarOportunidad}
         open={!!editarOportunidad}
         onClose={() => setEditarOportunidad(null)}
+      />
+
+      <GenerarEmailModal
+        open={emailModalOpen}
+        empresa={empresa}
+        contactos={contactos}
+        interacciones={interacciones}
+        onClose={() => setEmailModalOpen(false)}
       />
     </div>
   )
