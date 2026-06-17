@@ -39,6 +39,26 @@ const ETAPA_ORDEN: Record<Etapa, number> = {
   'Cotización enviada': 5, 'Cliente': 6, 'Inactivo/Perdido': 7,
 }
 
+function safeText(value: unknown) {
+  return String(value ?? '')
+}
+
+function safeLower(value: unknown) {
+  return safeText(value).toLowerCase()
+}
+
+function getEtapaCfg(etapa: unknown) {
+  return etapaConfig[etapa as Etapa] ?? etapaConfig.Prospecto
+}
+
+function getPrioridadCfg(prioridad: unknown) {
+  return prioridadConfig[prioridad as Prioridad] ?? prioridadConfig.Media
+}
+
+function getCanalIcon(canal: unknown) {
+  return canalEmoji[canal as Canal] ?? '·'
+}
+
 export default function Empresas() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -99,12 +119,15 @@ export default function Empresas() {
 
   const filtradas = useMemo(() => {
     let result = empresas.filter(e => {
-      const q = search.toLowerCase()
+      const q = safeLower(search)
       const matchSearch = !search ||
-        e.razon_social.toLowerCase().includes(q) ||
-        e.ciudad.toLowerCase().includes(q) ||
-        (e.sector as string).toLowerCase().includes(q) ||
-        (e.email_principal ?? '').toLowerCase().includes(q)
+        safeLower(e.razon_social).includes(q) ||
+        safeLower(e.nombre_fantasia).includes(q) ||
+        safeLower(e.cuit).includes(q) ||
+        safeLower(e.ciudad).includes(q) ||
+        safeLower(e.sector).includes(q) ||
+        safeLower(e.email_principal).includes(q) ||
+        safeLower(e.sitio_web).includes(q)
       return (
         matchSearch &&
         (!filtroEtapa  || e.etapa === filtroEtapa) &&
@@ -116,11 +139,11 @@ export default function Empresas() {
 
     result = [...result].sort((a, b) => {
       let cmp = 0
-      if (sortKey === 'razon_social') cmp = a.razon_social.localeCompare(b.razon_social, 'es')
-      else if (sortKey === 'etapa') cmp = ETAPA_ORDEN[a.etapa] - ETAPA_ORDEN[b.etapa]
-      else if (sortKey === 'sector') cmp = a.sector.localeCompare(b.sector, 'es')
-      else if (sortKey === 'ciudad') cmp = a.ciudad.localeCompare(b.ciudad, 'es')
-      else if (sortKey === 'prioridad') cmp = PRIORIDAD_ORDEN[a.prioridad] - PRIORIDAD_ORDEN[b.prioridad]
+      if (sortKey === 'razon_social') cmp = safeText(a.razon_social).localeCompare(safeText(b.razon_social), 'es')
+      else if (sortKey === 'etapa') cmp = (ETAPA_ORDEN[a.etapa] ?? 99) - (ETAPA_ORDEN[b.etapa] ?? 99)
+      else if (sortKey === 'sector') cmp = safeText(a.sector).localeCompare(safeText(b.sector), 'es')
+      else if (sortKey === 'ciudad') cmp = safeText(a.ciudad).localeCompare(safeText(b.ciudad), 'es')
+      else if (sortKey === 'prioridad') cmp = (PRIORIDAD_ORDEN[a.prioridad] ?? 99) - (PRIORIDAD_ORDEN[b.prioridad] ?? 99)
       else if (sortKey === 'proxima_accion_fecha') {
         const da = a.proxima_accion_fecha ?? '9999-12-31'
         const db = b.proxima_accion_fecha ?? '9999-12-31'
@@ -355,10 +378,10 @@ export default function Empresas() {
                 {duplicados.slice(0, 4).map(group => (
                   <button
                     key={group.key}
-                    onClick={() => setSearch(group.label)}
+                    onClick={() => setSearch(safeText(group.empresas[0]?.razon_social || group.label))}
                     className="text-xs px-2 py-1 rounded-sm border"
                     style={{ borderColor: '#A8893A40', color: '#A8893A', backgroundColor: 'var(--surface)' }}
-                    title={group.empresas.map(e => e.razon_social).join(' / ')}
+                    title={group.empresas.map(e => safeText(e.razon_social)).join(' / ')}
                   >
                     {group.reason}: {group.empresas.length} coincidencias
                   </button>
@@ -394,9 +417,9 @@ export default function Empresas() {
               ))}
 
               {!isLoading && filtradas.map((empresa, idx) => {
-                const etapa = etapaConfig[empresa.etapa]
+                const etapa = getEtapaCfg(empresa.etapa)
                 const vencida = esFechaVencida(empresa.proxima_accion_fecha)
-                const prio = prioridadConfig[empresa.prioridad]
+                const prio = getPrioridadCfg(empresa.prioridad)
                 return (
                   <tr
                     key={empresa.id}
@@ -413,7 +436,7 @@ export default function Empresas() {
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: prio.color }} />
                         <span className="font-medium truncate" style={{ color: 'var(--text)' }}>
-                          {empresa.razon_social}
+                          {safeText(empresa.razon_social) || 'Sin razon social'}
                         </span>
                       </div>
                     </td>
@@ -421,11 +444,11 @@ export default function Empresas() {
                     {/* Etapa — editable inline, evitar propagación al click de fila */}
                     <td className="px-4 py-2.5" onClick={e => e.stopPropagation()}>
                       <select
-                        value={empresa.etapa}
+                        value={ETAPAS_ORDEN.includes(empresa.etapa as Etapa) ? empresa.etapa : 'Prospecto'}
                         onChange={e => etapaMutation.mutate({
                           id: empresa.id,
                           etapa: e.target.value as Etapa,
-                          etapaAnterior: empresa.etapa,
+                          etapaAnterior: (ETAPAS_ORDEN.includes(empresa.etapa as Etapa) ? empresa.etapa : 'Prospecto') as Etapa,
                         })}
                         className="text-xs px-1.5 py-0.5 rounded-sm border focus:outline-none focus:ring-1 focus:ring-green-deep"
                         style={{ backgroundColor: etapa.bg, color: etapa.color, borderColor: etapa.color + '40' }}
@@ -434,15 +457,15 @@ export default function Empresas() {
                       </select>
                     </td>
 
-                    <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--text-2)' }}>{empresa.sector}</td>
-                    <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--text-2)' }}>{empresa.ciudad}</td>
-                    <td className="px-4 py-2.5 text-sm text-center" title={empresa.canal_preferido}>
-                      {canalEmoji[empresa.canal_preferido]}
+                    <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--text-2)' }}>{safeText(empresa.sector) || '-'}</td>
+                    <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--text-2)' }}>{safeText(empresa.ciudad) || '-'}</td>
+                    <td className="px-4 py-2.5 text-sm text-center" title={safeText(empresa.canal_preferido)}>
+                      {getCanalIcon(empresa.canal_preferido)}
                     </td>
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-1">
                         <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: prio.color }} />
-                        <span className="text-xs" style={{ color: 'var(--text-2)' }}>{empresa.prioridad}</span>
+                        <span className="text-xs" style={{ color: 'var(--text-2)' }}>{safeText(empresa.prioridad) || 'Media'}</span>
                       </div>
                     </td>
 
